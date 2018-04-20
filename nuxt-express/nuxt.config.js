@@ -23,7 +23,7 @@ module.exports = {
   ** 이를 한번만 포함하기 위해 사용
   */
   build: {
-    vendor: ['axios'],
+    vendor: ['axios', 'vee-validate'],
     /*
     ** Run ESLINT on save
     */
@@ -37,5 +37,8 @@ module.exports = {
         })
       }
     }
-  }
+  },
+  plugins: [
+    { src: '~plugins/vee-validate.js', ssr: true }
+  ]
 }

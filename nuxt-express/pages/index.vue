@@ -1,16 +1,28 @@
 <template>
   <section class="container">
-    <img src="~assets/img/logo.png" alt="Nuxt.js Logo" class="logo" />
-    <h1 class="title">
-      USERS
-    </h1>
-    <ul class="users">
-      <li v-for="(user, index) in users" :key="index" class="user">
-        <nuxt-link :to="{ name: 'id', params: { id: index }}">
-          {{ user.name }}
-        </nuxt-link>
-      </li>
-    </ul>
+    <div class="holder">
+      <!--
+      v-validate
+      errors 객체는 VeeValidate가 생성한 에러들
+      errors.has('vocabulary')란 vocabulary data 속성에 유효성 체크 에러가 발생했는지를 확인하는 것.
+      -->
+      <form @submit.prevent="addVocabulary">
+        <input type="text" placeholder="기억하고 싶은 단어를 입력하세요..." name="vocabulary" v-model="vocabulary" v-validate="'min:5'">
+        <transition name="alert-in" enter-active-class="animated flipInX" leave-active-class="animated flipOutX">
+          <p class="alert" v-if="errors.has('vocabulary')">
+            {{ errors.first('vocabulary') }}
+          </p>
+        </transition>      
+      </form>
+      <ul>
+        <transition-group name="list" enter-active-class="animated bounceInUp" leave-active-class="animated bounceOutDown">
+         <li v-for="( data, index ) in vocabularies" :key="index">{{ data.content }}
+          <i class="fa fa-minus-circle" v-on:click="remove(index)"></i>
+        </li>
+        </transition-group>
+      </ul>
+      <p>These are the vocabulary that you possess.</p>
+    </div>  
   </section>
 </template>
 
@@ -37,33 +49,106 @@
 
 */
 import axios from '~/plugins/axios'
-
+import veeValidate from '~/plugins/vee-validate'
+console.log(veeValidate)
 export default {
+  name: 'vocabulary',
+  data () {
+    return {
+      vocabulary: '',
+      vocabularies: []
+    }
+  },
   async asyncData () {
-    let { data } = await axios.get('/api/users')
-    return { users: data }
+    let { data } = await axios.get('/api/vc/list')
+    return { vocabularies: data }
   },
   head () {
     return {
       title: 'Users'
+    }
+  },
+  methods: {
+    addVocabulary () {
+      var vm = this
+      this.$validator.validateAll().then((result) => {
+        if (result) {
+          axios.post('/api/vc/add', {
+            vocabulary: this.vocabulary
+          }).then(function (response) {
+            vm.vocabularies = response.data
+          }).catch(function (error) {
+            console.log(error)
+          })
+          this.vocabulary = ''
+        } else {
+          console.log('Not valid')
+        }
+      })
+    },
+    remove (id) {
+      var vm = this
+      axios({
+        method: 'delete',
+        url: '/api/vc/remove',
+        data: {id: id},
+        headers: {'Content-Type': 'application/json'}
+      }).then(function (response) {
+        vm.vocabularies = response.data
+      }).catch(function (error) {
+        console.log(error)
+      })
     }
   }
 }
 </script>
 
 <style scoped>
-.title
-{
-  margin: 30px 0;
-}
-.users
-{
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.user
-{
-  margin: 10px 0;
-}
+  @import "https://cdn.jsdelivr.net/npm/animate.css@3.5.1";
+  @import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"; 
+  
+  .holder {
+    background: #fff;
+  }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
+  
+  ul li {
+    padding: 20px;
+    font-size: 1.3em;
+    background-color: #E0EDF4;
+    border-left: 5px solid #3EB3F6;
+    margin-bottom: 2px;
+    color: #3E5252;
+  }
+
+  p {
+    text-align:center;
+    padding: 30px 0;
+    color: gray;
+  }
+
+  input {
+    width: calc(100% - 40px);
+    border: 0;
+    padding: 20px;
+    font-size: 1.3em;
+    background-color: #323333;
+    color: #687F7F;
+  }
+
+  .alert {
+    background: #fdf2ce;
+    font-weight: bold;
+    display: inline-block;
+    padding: 5px;
+    margin-top: -20px;
+  }
+
+  i {
+    float: right;
+  }
 </style>
