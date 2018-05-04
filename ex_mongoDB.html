@@ -1,0 +1,76 @@
+<!--
+
+mongoDB 정리
+
+NoSQL
+Json 형태로 데이터를 저장함
+문서(Key:Value 쌍 집합), 각 json객체가 하나의 문서.
+_id : document의 유일성.
+여러개의 문서를 한 그룹에 모은 것을 컬렉션.
+ex) 사람 컬렉션, 동물 컬렉션.
+컬렉션의 다큐먼트 구조가 꼭 동일할 필요가 없다.
+
+{
+	"_id": ObjectId("5773de2b5ff1e156ee497cb1"),
+	"name": "abet",
+	"gender": "m",
+	"age": "20",
+	"phone": "010000000"
+}
+{
+	"_id": ObjectId("5773de2b5ff1e156ee497cb1"),
+	"name": "abet",
+	"gender": "m",
+	"age": "20",	
+}
+
+[데이터모델링 방식]
+{
+	_id: POST_ID,
+	title: POST_TITLE,
+	content: POST_CONTENT,
+	tags:[TAG1,TAG2,TAG3],
+	comments:[	---서브컬렉션.
+		{
+			username: COMMENT_WRITER,
+			message: COMMENT_MESSAGE
+	
+		},
+		{
+			username: COMMENT_WRITER,
+			message: COMMENT_MESSAGE
+	
+		}
+	]
+}
+
+[명령어]
+> mongod
+ 서버실행
+> mongo
+ 클라이언트실행
+> use database_name
+ 데이터베이스 생성, 이미 존재하는 경우 그 데이터베이스 사용
+*최소 한개의 다큐먼트 존재시 데이터베이스 보임.
+> show dbs 
+만든 데이터베이스 리스트
+> db
+ 현재 사용중인 데이터베이스 확인 
+> db.dropDatabase()
+ 현재 사용중인 데이터베이스 제거
+> db.createCollection(name,[options])
+ 컬렉션 생성
+> db.collection_name.drop()
+> db.collection_name.insert(document객체)
+*여러 객체 insert 시 배열 형태로
+> db.collection_name.remove(기준값, justOne옵션)
+기준값 예) {"name":"books"}
+justOne true 시, 대상이 여러개일 경우에도 1개만 제거
+> db.collection_name.find([query, projection])
+ 다큐먼트 조회
+> db.collection_name.find().pretty()
+ 이쁘게
+> db.collection_name.find({"name":"books"}).pretty()
+ name값이 books인 다큐먼트 조회
+
+-->
