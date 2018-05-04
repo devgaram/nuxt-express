@@ -1,9 +1,9 @@
 import { Router } from 'express'
-import vocabularies from '/json_data/vocabularies.json'
+import vocabularies from '../json_data/vocabularies.json'
 import fse from 'fs-extra'
 
 const router = Router()
-const file = 'json_data/vocabularies.json'
+const file = 'server/json_data/vocabularies.json'
 
 /* GET vocabularies */
 router.get('/vc/list', function (req, res, next) {
