@@ -17,7 +17,7 @@
       <ul>
         <transition-group name="list" enter-active-class="animated bounceInUp" leave-active-class="animated bounceOutDown">
          <li v-for="( data, index ) in vocabularies" :key="index">{{ data.content }}
-          <i class="fa fa-minus-circle" v-on:click="remove(index)"></i>
+          <i class="fa fa-minus-circle" v-on:click="remove(data._id)"></i>
         </li>
         </transition-group>
       </ul>
@@ -60,7 +60,7 @@ export default {
     }
   },
   async asyncData () {
-    let { data } = await axios.get('/api/vc/list')
+    let { data } = await axios.get('/api/list')
     return { vocabularies: data }
   },
   head () {
@@ -73,7 +73,7 @@ export default {
       var vm = this
       this.$validator.validateAll().then((result) => {
         if (result) {
-          axios.post('/api/vc/add', {
+          axios.post('/api/insert', {
             vocabulary: this.vocabulary
           }).then(function (response) {
             vm.vocabularies = response.data
@@ -90,7 +90,7 @@ export default {
       var vm = this
       axios({
         method: 'delete',
-        url: '/api/vc/remove',
+        url: '/api/delete',
         data: {id: id},
         headers: {'Content-Type': 'application/json'}
       }).then(function (response) {

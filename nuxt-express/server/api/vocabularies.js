@@ -1,46 +1,50 @@
 import { Router } from 'express'
-import vocabularies from '/json_data/vocabularies.json'
-import fse from 'fs-extra'
+import VocaModel from '../models/vocabularies'
 
 const router = Router()
-const file = 'json_data/vocabularies.json'
 
 /* GET vocabularies */
-router.get('/vc/list', function (req, res, next) {
-  res.json(vocabularies)
+router.get('/list', function (req, res, next) {
+
+  VocaModel.find(function(err, vocabularies){
+    if (err) return res.status(500).send({error:'database failure'});
+    res.json(vocabularies)
+  }) 
 })
 
-/* POST add voca*/
-router.post('/vc/add', function (req, res, next) {
+/* POST vocabularies */
+router.post('/insert', function (req, res, next) {
   if (!req.body) return res.sendStatus(400)
   let vocabulary = req.body.vocabulary
-  let objVocabulary = {}
-  objVocabulary.id = 10
-  objVocabulary.content = vocabulary
-  vocabularies.push(objVocabulary)
+  
+  let Voca = new VocaModel();
+  Voca.content = vocabulary;
 
-  fse.outputJson(file, vocabularies, err=>{
-  	console.log(err);
-  	fse.readJson(file, (err, data) =>{
-  		res.json(data);
-  	})
-  })
+
+  Voca.save(function(err){
+    if (err) return res.status(500).send({error:'database failure'});
+    VocaModel.find(function(err, vocabularies){
+      if (err) return res.status(500).send({error:'database failure'});
+      res.json(vocabularies)
+    }) 
+  }) 
 })
 
-/* DELETE remove voca */
-router.delete('/vc/remove', (req, res, next) =>{
+/* DELETE vocabularies */
+router.delete('/delete', function (req, res, next) {
   if (!req.body) return res.sendStatus(400)
   let id = req.body.id
-  var index = vocabularies.findIndex(voca => voca.id === id);
-  vocabularies.splice(index,1);
   
-  fse.outputJson(file, vocabularies, err=>{
-  	console.log(err);
-  	fse.readJson(file, (err, data) =>{
-  		res.json(data);
-  	})
+  VocaModel.remove({_id: id}, function(err, output){
+    if (err) return res.status(500).send({error:'database failure'});
+    VocaModel.find(function(err, vocabularies){
+      if (err) return res.status(500).send({error:'database failure'});
+      res.json(vocabularies)
+    }) 
   })
 
 })
+
+
 
 export default router

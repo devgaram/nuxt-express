@@ -2,6 +2,7 @@
 import express from 'express'
 import { Nuxt, Builder } from 'nuxt'
 import bodyParser from 'body-parser'
+import mongoose from 'mongoose'
 
 import api from './api'
 
@@ -18,6 +19,15 @@ app.use(bodyParser.json())
 
 // Import API Routes
 app.use('/api', api)
+
+// CONNECT TO MONGODB SERVER
+let db = mongoose.connection;
+db.on('error', console.error);
+db.once('open', ()=>{
+	//CONNECTED TO MONGODB SERVER
+	console.log("connected to mongod server");
+})
+mongoose.connect('mongodb://localhost/db_voca');
 
 // Import and Set Nuxt.js options
 let config = require('../nuxt.config.js')
